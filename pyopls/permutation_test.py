@@ -314,7 +314,7 @@ def _permutation_test_score(estimator, X, y, groups=None, cv='warn',
     """Auxiliary function for permutation_test_score"""
     if score_functions is None:
         score_functions = [r2_score]
-    y_pred = cross_val_predict(estimator, X, y, groups, cv, n_jobs, verbose, fit_params, pre_dispatch, method)
+    y_pred = cross_val_predict(estimator, X, y, groups=groups, cv=cv, n_jobs=n_jobs, verbose=verbose, fit_params=fit_params, pre_dispatch=pre_dispatch, method=method)
     cv_scores = [score_function(y, y_pred) for score_function in score_functions]
     return np.array(cv_scores)
 

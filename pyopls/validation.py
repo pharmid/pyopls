@@ -205,7 +205,7 @@ class OPLSValidator(BaseEstimator, TransformerMixin, RegressorMixin):
     def _validate(self, X, Y, n_components, score_function, cv=None, n_jobs=None, verbose=0, pre_dispatch='2*n_jobs'):
         cv = cv or self._get_validator(Y, self.k)
         Z = OPLS(n_components, self.scale).fit_transform(X, Y)
-        y_pred = cross_val_predict(PLSRegression(1, self.scale), Z, Y, cv=cv, n_jobs=n_jobs, verbose=verbose,
+        y_pred = cross_val_predict(PLSRegression(n_components=1, scale=self.scale), Z, Y, cv=cv, n_jobs=n_jobs, verbose=verbose,
                                    pre_dispatch=pre_dispatch)
         return score_function(Y, y_pred)
 
@@ -367,7 +367,7 @@ class OPLSValidator(BaseEstimator, TransformerMixin, RegressorMixin):
         """
         Z = OPLS(n_components, self.scale).fit_transform(X, y)
         x_loadings, permutation_x_loadings, p_values = feature_permutation_loading(
-            PLSRegression(1, self.scale), Z, y, self.n_inner_permutations, self.inner_alpha,
+            PLSRegression(n_components=1, scale=self.scale), Z, y, self.n_inner_permutations, self.inner_alpha,
             self.n_outer_permutations, random_state, n_jobs, verbose, pre_dispatch
         )
         return p_values < self.outer_alpha, p_values, permutation_x_loadings
@@ -376,7 +376,7 @@ class OPLSValidator(BaseEstimator, TransformerMixin, RegressorMixin):
         Z = self.opls_.transform(X)
         cv = cv or self._get_validator(y, self.k)
         check_is_fitted(self, ['opls_', 'pls_', 'binarizer_'])
-        y_pred = cross_val_predict(PLSRegression(1, self.scale), Z, y, cv=cv, n_jobs=n_jobs, verbose=verbose,
+        y_pred = cross_val_predict(PLSRegression(n_components=1, scale=self.scale), Z, y, cv=cv, n_jobs=n_jobs, verbose=verbose,
                                    pre_dispatch=pre_dispatch)
         return roc_curve(y, y_pred)
 
@@ -462,7 +462,7 @@ class OPLSValidator(BaseEstimator, TransformerMixin, RegressorMixin):
 
         self.opls_ = OPLS(self.n_components_, self.scale).fit(X, y)
         Z = self.opls_.transform(X)
-        self.pls_ = PLSRegression(1, self.scale).fit(Z, y)
+        self.pls_ = PLSRegression(n_components=1, scale=self.scale).fit(Z, y)
         self.r_squared_X_ = self.opls_.score(X)
         y_pred = self.pls_.predict(Z)
         self.r_squared_Y_ = r2_score(y, y_pred)
@@ -477,7 +477,7 @@ class OPLSValidator(BaseEstimator, TransformerMixin, RegressorMixin):
 
         _log('Performing cross-validated metric permutation tests.')
 
-        cv_results = permutation_test_score(PLSRegression(1, self.scale), Z, y, cv=cv,
+        cv_results = permutation_test_score(PLSRegression(n_components=1, scale=self.scale), Z, y, cv=cv,
                                             n_permutations=self.n_permutations, cv_score_functions=score_functions,
                                             n_jobs=n_jobs, verbose=verbose, pre_dispatch=pre_dispatch)
         if self.is_discrimination(y):
