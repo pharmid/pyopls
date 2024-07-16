@@ -210,7 +210,7 @@ class OPLSValidator(BaseEstimator, TransformerMixin, RegressorMixin):
         return score_function(Y, y_pred)
 
     def _process_binary_target(self, y, pos_label=None):
-        self.binarizer_ = LabelBinarizer(-1, 1)
+        self.binarizer_ = LabelBinarizer(neg_label=-1, pos_label=1)
         self.binarizer_.fit(y)
         if pos_label is not None and self.binarizer_.transform([pos_label])[0] == -1:
             self.binarizer_.classes_ = np.flip(self.binarizer_.classes_)
